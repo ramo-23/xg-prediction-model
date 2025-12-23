@@ -1,26 +1,3 @@
-Retraining models with match-context features
---------------------------------------------
-If you want model predictions to reflect match context (Home/Away, Game State), ensure these features are present in your processed CSV and then retrain models:
-
-1. Add or compute these columns in your processed data (recommended names):
-  - `is_home`: binary (1 for home, 0 for away)
-  - `home_away`: categorical (`Home` / `Away`) — optional
-  - `game_state`: categorical (`Winning` / `Drawing` / `Losing`) or one-hot columns `game_state_Winning`, `game_state_Drawing`, `game_state_Losing`
-
-2. Place the updated processed CSV in `data/processed/` (filename will be detected automatically).
-
-3. Retrain models (this script will automatically include `is_home`, `home_away`, `game_state`, and any `game_state_*` columns if present):
-
-```powershell
-python scripts/train_models.py
-```
-
-4. After training, updated calibrated model artifacts will be saved under `results/metrics/` (e.g., `model_xgboost_calibrated.joblib`). The Streamlit app will use these when you select a model in the UI.
-Notes
------
-- Feature names and encodings used at inference must match those used during training (the training script automatically detects commonly-used names above).
-- If you perform custom preprocessing (scalers, encoders), wrap the preprocessing and classifier in a `sklearn.pipeline.Pipeline` so the saved model includes preprocessing.
-- For model-specific explanations, install `shap` and use the Streamlit UI to view SHAP contributions.
 # Expected Goals (xG) Model
 
 ## Overview
