@@ -1,0 +1,25 @@
+Model summary (roc_auc, brier):
+- logistic: ROC AUC=0.738
+  Brier=0.0895
+  Confusion matrix: [[712, 3], [84, 7]]
+- random_forest: ROC AUC=0.638
+  Brier=0.0977
+  Confusion matrix: [[715, 0], [91, 0]]
+- xgboost: ROC AUC=0.657
+  Brier=0.0966
+  Confusion matrix: [[711, 4], [87, 4]]
+- neural_network: ROC AUC=0.500
+  Brier=0.1002
+  Confusion matrix: [[715, 0], [91, 0]]
+Quick interpretation:
+- logistic: Good discrimination (ROC AUC=0.738). Evaluate calibration and practical thresholds.
+- random_forest: Moderate discrimination (ROC AUC=0.638). Consider calibration and threshold tuning for downstream decisions.
+- xgboost: Moderate discrimination (ROC AUC=0.657). Consider calibration and threshold tuning for downstream decisions.
+- neural_network: Low discrimination (ROC AUC=0.500). Consider richer features or resampling/hyperparameter tuning.
+  Brier score 0.100 indicates probability estimates are noisy; recalibration or more data may help.
+
+Saved figures:
+- calibration_reliability.png
+- precision_recall_curves.png
+- probability_histograms.png
+- roc_curves.png
