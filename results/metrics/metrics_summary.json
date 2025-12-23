@@ -1,58 +1,138 @@
 {
   "logistic": {
+    "classification_report": {
+      "0": {
+        "precision": 0.8944723618090452,
+        "recall": 0.9958041958041958,
+        "f1-score": 0.9424222369291859,
+        "support": 715.0
+      },
+      "1": {
+        "precision": 0.7,
+        "recall": 0.07692307692307693,
+        "f1-score": 0.13861386138613863,
+        "support": 91.0
+      },
+      "accuracy": 0.892059553349876,
+      "macro avg": {
+        "precision": 0.7972361809045225,
+        "recall": 0.5363636363636364,
+        "f1-score": 0.5405180491576622,
+        "support": 806.0
+      },
+      "weighted avg": {
+        "precision": 0.8725158048306046,
+        "recall": 0.892059553349876,
+        "f1-score": 0.8516696784001323,
+        "support": 806.0
+      }
+    },
     "roc_auc": 0.7383232152462923,
-    "brier": 0.08951631530112064,
-    "cm": [
-      [
-        712,
-        3
-      ],
-      [
-        84,
-        7
-      ]
-    ]
+    "brier_score": 0.08951631530112064,
+    "train_time_seconds": 0.1423022747039795
   },
   "random_forest": {
+    "best_params": {
+      "clf__max_depth": null,
+      "clf__n_estimators": 200
+    },
+    "classification_report": {
+      "0": {
+        "precision": 0.8870967741935484,
+        "recall": 1.0,
+        "f1-score": 0.9401709401709402,
+        "support": 715.0
+      },
+      "1": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1-score": 0.0,
+        "support": 91.0
+      },
+      "accuracy": 0.8870967741935484,
+      "macro avg": {
+        "precision": 0.4435483870967742,
+        "recall": 0.5,
+        "f1-score": 0.4700854700854701,
+        "support": 806.0
+      },
+      "weighted avg": {
+        "precision": 0.7869406867845994,
+        "recall": 0.8870967741935484,
+        "f1-score": 0.8340226082161566,
+        "support": 806.0
+      }
+    },
     "roc_auc": 0.6383770076077768,
-    "brier": 0.09772311024578152,
-    "cm": [
-      [
-        715,
-        0
-      ],
-      [
-        91,
-        0
-      ]
-    ]
+    "brier_score": 0.09772311024578152,
+    "train_time_seconds": 10.965763568878174
   },
   "xgboost": {
+    "best_params": {
+      "clf__max_depth": 3,
+      "clf__n_estimators": 100
+    },
+    "classification_report": {
+      "0": {
+        "precision": 0.8909774436090225,
+        "recall": 0.9944055944055944,
+        "f1-score": 0.9398545935228024,
+        "support": 715.0
+      },
+      "1": {
+        "precision": 0.5,
+        "recall": 0.04395604395604396,
+        "f1-score": 0.08080808080808081,
+        "support": 91.0
+      },
+      "accuracy": 0.8870967741935484,
+      "macro avg": {
+        "precision": 0.6954887218045113,
+        "recall": 0.5191808191808192,
+        "f1-score": 0.5103313371654417,
+        "support": 806.0
+      },
+      "weighted avg": {
+        "precision": 0.8468348290080039,
+        "recall": 0.8870967741935484,
+        "f1-score": 0.8428654711195274,
+        "support": 806.0
+      }
+    },
     "roc_auc": 0.6570660109121648,
-    "brier": 0.09656357872373492,
-    "cm": [
-      [
-        711,
-        4
-      ],
-      [
-        87,
-        4
-      ]
-    ]
+    "brier_score": 0.09656357872373492,
+    "train_time_seconds": 4.627262115478516
   },
   "neural_network": {
+    "classification_report": {
+      "0": {
+        "precision": 0.8870967741935484,
+        "recall": 1.0,
+        "f1-score": 0.9401709401709402,
+        "support": 715.0
+      },
+      "1": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1-score": 0.0,
+        "support": 91.0
+      },
+      "accuracy": 0.8870967741935484,
+      "macro avg": {
+        "precision": 0.4435483870967742,
+        "recall": 0.5,
+        "f1-score": 0.4700854700854701,
+        "support": 806.0
+      },
+      "weighted avg": {
+        "precision": 0.7869406867845994,
+        "recall": 0.8870967741935484,
+        "f1-score": 0.8340226082161566,
+        "support": 806.0
+      }
+    },
     "roc_auc": 0.5,
-    "brier": 0.10015762673250866,
-    "cm": [
-      [
-        715,
-        0
-      ],
-      [
-        91,
-        0
-      ]
-    ]
+    "brier_score": 0.10015762673250866,
+    "train_time_seconds": 0.3602566719055176
   }
 }

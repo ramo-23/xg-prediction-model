@@ -27,6 +27,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 from typing import Literal
 from sklearn.calibration import CalibratedClassifierCV
+import time
 
 def _make_calibrator(estimator, method: Literal['sigmoid', 'isotonic'] = 'isotonic'):
     """Return a CalibratedClassifierCV instance.
@@ -88,6 +89,20 @@ def prepare_features(df: pd.DataFrame):
     if 'assist_type' in df.columns:
         cat_feats.append('assist_type')
 
+    # Optional contextual features (home/away, game state)
+    # Prefer explicit binary `is_home` if present; otherwise use `home_away` as categorical
+    if 'is_home' in df.columns and 'is_home' not in binary_feats:
+        binary_feats.append('is_home')
+    if 'home_away' in df.columns and 'home_away' not in cat_feats:
+        cat_feats.append('home_away')
+    if 'game_state' in df.columns and 'game_state' not in cat_feats:
+        cat_feats.append('game_state')
+    # Also accept one-hot style game_state_* columns
+    for gs in ['Winning', 'Drawing', 'Losing']:
+        col = f'game_state_{gs}'
+        if col in df.columns and col not in binary_feats:
+            binary_feats.append(col)
+
     feature_cols = numeric_feats + binary_feats + cat_feats
     X = df[feature_cols].copy()
     return X, y, numeric_feats, binary_feats, cat_feats
@@ -128,13 +143,15 @@ def train_and_evaluate(X, y, preprocessor):
         ('pre', preprocessor),
         ('clf', LogisticRegression(class_weight='balanced', max_iter=1000))
     ])
+    start = time.time()
     pipe_lr.fit(X_train_full, y_train_full)
     # calibrate on validation
     calib_lr = _make_calibrator(pipe_lr, method='isotonic')
     calib_lr.fit(X_val, y_val)
+    lr_time = time.time() - start
     y_pred_proba = calib_lr.predict_proba(X_test)[:, 1]
     y_pred = (y_pred_proba >= 0.5).astype(int)
-    results['logistic'] = summarize_metrics(y_test, y_pred, y_pred_proba)
+    results['logistic'] = {**summarize_metrics(y_test, y_pred, y_pred_proba), 'train_time_seconds': lr_time}
     joblib.dump(calib_lr, OUT / 'model_logistic_calibrated.joblib')
 
     # Random Forest with simple grid search
@@ -143,13 +160,15 @@ def train_and_evaluate(X, y, preprocessor):
     param_grid = {'clf__n_estimators': [100, 200], 'clf__max_depth': [None, 10]}
     cv = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
     gs_rf = GridSearchCV(pipe_rf, param_grid, cv=cv, scoring='roc_auc', n_jobs=-1)
+    start = time.time()
     gs_rf.fit(X_train_full, y_train_full)
     best_rf = gs_rf.best_estimator_
     calib_rf = _make_calibrator(best_rf, method='isotonic')
     calib_rf.fit(X_val, y_val)
+    rf_time = time.time() - start
     y_pred_proba = calib_rf.predict_proba(X_test)[:, 1]
     y_pred = (y_pred_proba >= 0.5).astype(int)
-    results['random_forest'] = {'best_params': gs_rf.best_params_, **summarize_metrics(y_test, y_pred, y_pred_proba)}
+    results['random_forest'] = {'best_params': gs_rf.best_params_, **summarize_metrics(y_test, y_pred, y_pred_proba), 'train_time_seconds': rf_time}
     joblib.dump(calib_rf, OUT / 'model_random_forest_calibrated.joblib')
 
     # XGBoost with simple tuning
@@ -162,13 +181,15 @@ def train_and_evaluate(X, y, preprocessor):
     neg = len(y_train_full) - pos
     scale_pos_weight = max(1, neg / max(1, pos))
     xgb_clf.set_params(scale_pos_weight=scale_pos_weight)
+    start = time.time()
     gs_xgb.fit(X_train_full, y_train_full)
     best_xgb = gs_xgb.best_estimator_
     calib_xgb = _make_calibrator(best_xgb, method='isotonic')
     calib_xgb.fit(X_val, y_val)
+    xgb_time = time.time() - start
     y_pred_proba = calib_xgb.predict_proba(X_test)[:, 1]
     y_pred = (y_pred_proba >= 0.5).astype(int)
-    results['xgboost'] = {'best_params': gs_xgb.best_params_, **summarize_metrics(y_test, y_pred, y_pred_proba)}
+    results['xgboost'] = {'best_params': gs_xgb.best_params_, **summarize_metrics(y_test, y_pred, y_pred_proba), 'train_time_seconds': xgb_time}
     joblib.dump(calib_xgb, OUT / 'model_xgboost_calibrated.joblib')
 
     # Neural Network (MLP) - optional deep model
@@ -177,12 +198,14 @@ def train_and_evaluate(X, y, preprocessor):
                         max_iter=500, random_state=42)
     pipe_mlp = Pipeline([('pre', preprocessor), ('clf', mlp)])
     # Fit on full training, calibrate on validation like other models
+    start = time.time()
     pipe_mlp.fit(X_train_full, y_train_full)
     calib_mlp = _make_calibrator(pipe_mlp, method='isotonic')
     calib_mlp.fit(X_val, y_val)
+    mlp_time = time.time() - start
     y_pred_proba = calib_mlp.predict_proba(X_test)[:, 1]
     y_pred = (y_pred_proba >= 0.5).astype(int)
-    results['neural_network'] = summarize_metrics(y_test, y_pred, y_pred_proba)
+    results['neural_network'] = {**summarize_metrics(y_test, y_pred, y_pred_proba), 'train_time_seconds': mlp_time}
     joblib.dump(calib_mlp, OUT / 'model_neural_network_calibrated.joblib')
 
     # Save metrics

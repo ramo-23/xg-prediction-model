@@ -8,3 +8,4 @@ seaborn
 plotly
 mplsoccer
 pytest
+shap==0.42.1
