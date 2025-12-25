@@ -1,5 +1,19 @@
-"""Data collection utilities using soccerdata (FBref).
+"""Data collection utilities (FBref / soccerdata wrappers).
+
+This module centralises functions that fetch data from FBref via the
+`soccerdata` package when available. Functions return empty DataFrames as a
+safe default if `soccerdata` is not installed or network access fails.
+
+Provided helpers:
+- `fetch_shot_events`, `fetch_match_schedule`, `fetch_team_stats`,
+  `fetch_player_stats`: thin wrappers that prefer robust failure modes.
+- `save_raw_data`: persist DataFrame to CSV and write a small README with
+  basic metadata.
+
+The code is intentionally defensive to make notebooks and scripts runnable in
+offline or CI environments where `soccerdata` may not be present.
 """
+
 from typing import Optional
 
 try:

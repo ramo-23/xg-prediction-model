@@ -111,7 +111,16 @@ def fe_game_half(df: pd.DataFrame, minute_col: str = 'minute') -> pd.DataFrame:
             return None
 
     df['minute_num'] = df[minute_col].apply(parse_min) if minute_col in df.columns else None
-    df['half'] = df['minute_num'].apply(lambda x: 1 if x is not None and x <= 45 else (2 if x is not None else None))
+
+    def determine_half(x):
+        if pd.isna(x):
+            return None
+        try:
+            return 1 if float(x) <= 45 else 2
+        except Exception:
+            return None
+
+    df['half'] = df['minute_num'].apply(determine_half)
     return df
 
 
@@ -121,10 +130,11 @@ def fe_big_chance(df: pd.DataFrame, distance_col: str = 'distance', outcome_col:
     """
     df = df.copy()
     d = df[distance_col] if distance_col in df.columns else pd.Series([None]*len(df))
-    df['big_chance'] = ((pd.to_numeric(d, errors='coerce') <= 6)).fillna(False).astype(int)
-    # additional keyword-based heuristics
-    df['big_chance'] = df['big_chance'] | df[outcome_col].fillna('').str.lower().str.contains('tap').fillna(False)
-    df['big_chance'] = df['big_chance'].astype(int)
+    df['big_chance'] = ((pd.to_numeric(d, errors='coerce') <= 6)).fillna(False)
+    # additional keyword-based heuristics: 'tap' and variants of one-on-one
+    outcome_text = df[outcome_col].fillna('').str.lower()
+    keyword_flag = outcome_text.str.contains('tap', regex=False).fillna(False) | outcome_text.str.contains('one-on', regex=False).fillna(False) | outcome_text.str.contains('one on', regex=False).fillna(False)
+    df['big_chance'] = (df['big_chance'] | keyword_flag).astype(int)
     return df
 
 

@@ -11,7 +11,6 @@ If you are looking for a hands-on example of applied machine learning in sports 
 ## Who this is for
 - Students and hobbyist data scientists learning how to structure end-to-end ML projects.
 - Football analysts interested in how xG models are built, evaluated, and interpreted.
-- Developers seeking a reproducible baseline to extend with richer features, alternative models, or deployment workflows.
 
 ## Repository structure
 - `data/processed/`  
@@ -77,6 +76,24 @@ python scripts/run_imbalance_experiments.py
   * A single-shot probability predictor using `ipywidgets`
     (`ipywidgets` is imported dynamically to avoid editor missing-import warnings.)
 * A previous Streamlit starter app has been removed in favor of notebook-based interactive exploration.
+
+## Developer notes
+
+- Run tests:
+
+```powershell
+& venv\Scripts\Activate.ps1
+python -m pytest -q
+```
+
+- Code layout: see `src/` for core modules. Functions are intentionally small
+  and tested via `tests/` for easier maintenance.
+
+- When adding features or changing inference logic, update or add unit tests
+  in `tests/test_features.py` to cover edge cases and expected behaviors.
+
+- Formatting: follow standard Python conventions (PEP8). Use `black` or
+  `ruff` if available in your editor/CI.
 
 ## Contributing
 
